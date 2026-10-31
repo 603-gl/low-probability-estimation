@@ -176,8 +176,13 @@ def ITGIS(
     - The estimated probability of outputing token `target`.
     """
 
+    # vocabulary |V|
     d_vocab = model.embed.d_vocab
+
+    # orig_dists p_1,...,p_k, so its length is k, input length
     ctx_len = len(orig_dists)
+
+    # score functions s_i where i is for each token in the input (i is from 1 to k)
     scores = th.zeros((ctx_len, d_vocab), device=model.device)
 
     for param in model.parameters():
@@ -185,6 +190,8 @@ def ITGIS(
 
     imp_samp_probs = []
     assert n_samples % batch_size == 0
+    
+    # n_samples // batch_size is the number of iterations, where j is iterated through
     for i in tqdm(list(range(n_samples // batch_size)), disable=not show_progress):
         target_samples = []
         target_logratios = []
@@ -192,6 +199,7 @@ def ITGIS(
             temp * (1 - decay_rate**i) / (1 - decay_rate) if i > 0 else 1
         )  # adjust temperature for exponential moving average
         for dist, scores_at_pos in zip(orig_dists, scores):
+            # q_i (x) ← p_i (x) · exp(s_i (x) / T) for all x ∈ V
             samples_at_pos = dist.boltzmann_distribution(
                 scores=scores_at_pos[dist.values], temperature=adj_temp
             ).sample((batch_size,))
@@ -207,6 +215,7 @@ def ITGIS(
         logratios = th.stack(target_logratios, dim=1)  # (batch_size, ctx_len)
 
         with th.enable_grad():
+            # rewrite x = x_1,...,x_n as one_hot encoding
             onehot = th.nn.functional.one_hot(
                 samples, num_classes=d_vocab
             ).float()  # (batch_size, ctx_len, d_vocab)
