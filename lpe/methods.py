@@ -268,8 +268,14 @@ def MHIS(
     Returns:
     - The estimated probability of outputing token `target`.
     """
+
+    # vocabulary |V|
     d_vocab = model.embed.d_vocab
+    
+    # orig_dists p_1,...,p_k, so its length is k, input length
     ctx_len = len(orig_dists)
+
+    # score functions s_i where i is for each token in the input (i is from 1 to k)
     scores = th.zeros((ctx_len, d_vocab), device=model.device)
 
     for param in model.parameters():
