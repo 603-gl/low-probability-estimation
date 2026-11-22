@@ -1,5 +1,5 @@
 # Low Probability Estimation
-**NOTE: This is a forked repo of the public repo.**
+**NOTE: This is a forked repo of the public repo. This contains my own notes of understanding of the original repo and paper.**
 
 Public code to accompany ["Estimating the Probabilities of Rare Outputs in Language Models"](https://arxiv.org/abs/2410.13211). This repo contains:
 - Code for QLD, MHIS, ITGIS, and GLD estimation methods (`lpe/methods.py`)
