@@ -383,7 +383,12 @@ def MHIS(
     results = th.cat(results)
     scores = th.cat(scores)
     exp_scores = th.exp(scores / temp)
+    
+    # Z ← 1 / n  \sum over j=1 [exp(−Mt(samples[j])/T ) −1]
     normalizing_constant = 1 / (1 / exp_scores).mean().item()  # E_p[exp(s(x)/temp)]
+
+    # inside the sum: exp(Mt(samples[j])/T ) / Z \times 1[M (samples[j]) = t]
     unbiased_estimates = results * normalizing_constant / exp_scores
 
+    # mean takes 1/n and sum over all n
     return unbiased_estimates.mean().item()
